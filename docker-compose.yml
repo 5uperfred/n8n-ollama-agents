@@ -7,6 +7,8 @@ volumes:
 
 networks:
   bridge:
+  caddy:
+    external: true
 
 x-n8n: &service-n8n
   image: n8nio/n8n:latest
@@ -95,8 +97,17 @@ services:
     <<: *service-n8n
     container_name: n8n
     restart: unless-stopped
-    ports:
-      - 5678:5678
+    environment:
+      - N8N_HOST=n8n.fuentefunding.com
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://n8n.fuentefunding.com/
+    networks:
+      - bridge
+      - caddy
+    expose:
+      - "5678"
     volumes:
       - n8n_storage:/home/node/.n8n
       - ./n8n/backup:/backup
